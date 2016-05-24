@@ -10,3 +10,14 @@ This library provides an interoperability layer between FS2 and Scalaz. At this 
     import fs2.interop.scalaz.reverse._ // Provides conversions from Scalaz to FS2 (e.g., Scalaz Monad to FS2 Monad)
 
 Note: importing both of these in to the same lexical scope may cause issues with ambiguous implicits.
+
+### <a id="getit"></a> Where to get the latest version ###
+
+The 0.1.0 release is coming soon and you can start using the milestone release now.
+
+```
+// available for Scala 2.11.8 + Scalaz 7.2.3
+libraryDependencies += "co.fs2" %% "fs2-scalaz" % "0.1.0-M2"
+```
+
+
