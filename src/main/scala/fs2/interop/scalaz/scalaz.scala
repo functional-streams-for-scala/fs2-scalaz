@@ -12,6 +12,8 @@ package object scalaz extends Instances {
 
   object reverse extends ReverseInstances
 
+  object async extends TaskAsyncInstances
+
   implicit class StreamScalazOps[F[_], A](val self: Stream[F, A]) extends AnyVal {
 
     def foldMap[B](f: A => B)(implicit M: Monoid[B]): Stream[F, B] =
