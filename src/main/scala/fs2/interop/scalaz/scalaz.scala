@@ -8,7 +8,7 @@ import _root_.scalaz.std.vector._
 
 import fs2.util.{ Catchable, Free }
 
-package object scalaz extends Instances {
+package object scalaz extends Instances with TaskAsyncInstances {
 
   object reverse extends ReverseInstances
 

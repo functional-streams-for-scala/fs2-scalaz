@@ -35,8 +35,9 @@ scalacOptions in (Test, console) <<= (scalacOptions in (Compile, console))
 resolvers += "Sonatype Public" at "https://oss.sonatype.org/content/groups/public/"
 val scalazVersion = "7.2.3"
 libraryDependencies ++= Seq(
-  "co.fs2" %% "fs2-core" % "0.9.0-M2",
-  "org.scalaz" %% "scalaz-core" % scalazVersion
+  "co.fs2"     %% "fs2-core"          % "0.9.0-M2",
+  "org.scalaz" %% "scalaz-core"       % scalazVersion,
+  "org.scalaz" %% "scalaz-concurrent" % scalazVersion
 )
 
 scmInfo := Some(ScmInfo(url("https://github.com/functional-streams-for-scala/fs2-scalaz"), "git@github.com:functional-streams-for-scala/fs2-scalaz.git"))
