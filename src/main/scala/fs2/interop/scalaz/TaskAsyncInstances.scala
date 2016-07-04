@@ -13,23 +13,14 @@ import _root_.scalaz.syntax.either._
 trait TaskAsyncInstances {
 
   implicit def asyncInstance(implicit S:Strategy): Async[Task] = new Async[Task] {
-    type Ref[A] = ScalazTask.Ref[A]
-    def access[A](r: Ref[A]) = r.access.map {
-      case (a, f) => (a, f.compose(\/.fromEither))
-    }
-    def set[A](r: Ref[A])(a: Task[A]): Task[Unit] = r.set(a)
-    def runSet[A](r: Ref[A])(a: Either[Throwable,A]): Unit = r.runSet(\/.fromEither(a))
-    def ref[A]: Task[Ref[A]] = ScalazTask.ref[A](S)
-    override def get[A](r: Ref[A]): Task[A] = r.get
-    def cancellableGet[A](r: Ref[A]): Task[(Task[A], Task[Unit])] = r.cancellableGet
-    def setFree[A](q: Ref[A])(a: Free[Task, A]): Task[Unit] = q.setFree(a)
-    def bind[A, B](a: Task[A])(f: (A) => Task[B]): Task[B] = a flatMap f
+    def ref[A]: Task[Async.Ref[Task,A]] = ScalazTask.ref[A](S)
+    def flatMap[A, B](a: Task[A])(f: (A) => Task[B]): Task[B] = a flatMap f
     def pure[A](a: A): Task[A] = Task.now(a)
     override def delay[A](a: => A) = Task.delay(a)
     def suspend[A](fa: => Task[A]) = Task.suspend(fa)
     def fail[A](err: Throwable): Task[A] = Task.fail(err)
     def attempt[A](fa: Task[A]): Task[Either[Throwable, A]] = fa.attempt.map(_.toEither)
-    override def toString = "Run[scalaz.concurrent.Task]"
+    override def toString = "Async[scalaz.concurrent.Task]"
   }
 
   implicit def runInstance(implicit S:Strategy): Async.Run[Task] = new Async.Run[Task] {
@@ -51,7 +42,7 @@ trait TaskAsyncInstances {
    * https://github.com/functional-streams-for-scala/fs2/blob/series/0.9/LICENSE
    */
   private[fs2] object ScalazTask {
-    type Callback[A] = \/[Throwable,A] => Unit
+    private type Callback[A] = \/[Throwable,A] => Unit
 
     private trait MsgId
     private trait Msg[A]
@@ -103,13 +94,13 @@ trait TaskAsyncInstances {
       new Ref(actor)
     }
 
-    class Ref[A] private[fs2](actor: Actor[Msg[A]]) {
+    class Ref[A] private[fs2](actor: Actor[Msg[A]])(implicit S: Strategy, protected val F: Async[Task]) extends Async.Ref[Task,A] {
 
-      def access: Task[(A, \/[Throwable,A] => Task[Boolean])] =
+      def access: Task[(A, Either[Throwable,A] => Task[Boolean])] =
         Task.delay(new MsgId {}).flatMap { mid =>
           getStamped(mid).map { case (a, id) =>
-            val set = (a: \/[Throwable,A]) =>
-              Task.async[Boolean] { cb => actor ! Msg.TrySet(id, a, cb) }
+            val set = (a: Either[Throwable,A]) =>
+              Task.async[Boolean] { cb => actor ! Msg.TrySet(id, \/.fromEither(a), cb) }
             (a, set)
           }
         }
@@ -118,18 +109,18 @@ trait TaskAsyncInstances {
        * Return a `Task` that submits `t` to this ref for evaluation.
        * When it completes it overwrites any previously `put` value.
        */
-      def set(t: Task[A])(implicit S: Strategy): Task[Unit] =
+      def set(t: Task[A]): Task[Unit] =
         Task.delay { S { t.unsafePerformAsync { r => actor ! Msg.Set(r) } }; () }
-      def setFree(t: Free[Task,A])(implicit S: Strategy): Task[Unit] =
-        set(t.run)
-      def runSet(e: \/[Throwable,A]): Unit =
-        actor ! Msg.Set(e)
+      def setFree(t: Free[Task,A]): Task[Unit] =
+        set(t.run(F))
+      def runSet(e: Either[Throwable,A]): Unit =
+        actor ! Msg.Set(\/.fromEither(e))
 
       private def getStamped(msg: MsgId): Task[(A,Long)] =
         Task.async[(A,Long)] { cb => actor ! Msg.Read(cb, msg) }
 
       /** Return the most recently completed `set`, or block until a `set` value is available. */
-      def get: Task[A] = Task.delay(new MsgId {}).flatMap { mid => getStamped(mid).map(_._1) }
+      override def get: Task[A] = Task.delay(new MsgId {}).flatMap { mid => getStamped(mid).map(_._1) }
 
       /** Like `get`, but returns a `Task[Unit]` that can be used cancel the subscription. */
       def cancellableGet: Task[(Task[A], Task[Unit])] = Task.delay {
