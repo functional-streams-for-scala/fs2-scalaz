@@ -46,7 +46,6 @@ licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 
 initialCommands := s"""
   import fs2._
-  import fs2.util.Task
   import fs2.interop.scalaz._
   import scalaz._
   import Scalaz._
