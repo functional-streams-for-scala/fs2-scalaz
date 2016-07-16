@@ -20,7 +20,7 @@ The 0.1.0 release is coming soon and you can start using the milestone release n
 
 ```scala
 // available for Scala 2.11.8 + Scalaz 7.2.3
-libraryDependencies += "co.fs2" %% "fs2-scalaz" % "0.1.0-M4"
+libraryDependencies += "co.fs2" %% "fs2-scalaz" % "0.1.0-M6"
 ```
 
 
