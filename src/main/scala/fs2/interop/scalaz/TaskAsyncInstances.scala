@@ -2,9 +2,8 @@ package fs2.interop.scalaz
 
 import java.util.concurrent.atomic.{ AtomicBoolean, AtomicReference }
 
-import fs2.Async
 import fs2.internal.LinkedMap
-import fs2.util.Free
+import fs2.util.{ Async, Attempt, Effect, Free }
 import _root_.scalaz.\/
 import _root_.scalaz.concurrent.{ Strategy, Task, Actor }
 import _root_.scalaz.syntax.either._
@@ -12,22 +11,20 @@ import _root_.scalaz.syntax.either._
 
 trait TaskAsyncInstances {
 
-  implicit def asyncInstance(implicit S:Strategy): Async[Task] = new Async[Task] {
-    def ref[A]: Task[Async.Ref[Task,A]] = ScalazTask.ref[A](S)
-    def flatMap[A, B](a: Task[A])(f: (A) => Task[B]): Task[B] = a flatMap f
-    def pure[A](a: A): Task[A] = Task.now(a)
+  protected class EffectTask extends Effect[Task] {
+    def pure[A](a: A) = Task.now(a)
+    def flatMap[A,B](a: Task[A])(f: A => Task[B]): Task[B] = a flatMap f
     override def delay[A](a: => A) = Task.delay(a)
     def suspend[A](fa: => Task[A]) = Task.suspend(fa)
-    def fail[A](err: Throwable): Task[A] = Task.fail(err)
-    def attempt[A](fa: Task[A]): Task[Either[Throwable, A]] = fa.attempt.map(_.toEither)
-    override def toString = "Async[scalaz.concurrent.Task]"
+    def fail[A](err: Throwable) = Task.fail(err)
+    def attempt[A](t: Task[A]) = t.attempt.map(_.toEither)
+    def unsafeRunAsync[A](t: Task[A])(cb: Attempt[A] => Unit): Unit = t.unsafePerformAsync(d => cb(d.toEither))
+    override def toString = "Effect[Task]"
   }
 
-  implicit def runInstance(implicit S:Strategy): Async.Run[Task] = new Async.Run[Task] {
-    def unsafeRunAsyncEffects(f: Task[Unit])(onError: Throwable => Unit) = {
-      val _ = S(f.unsafePerformAsync(_.fold(onError, _ => ())))
-    }
-    override def toString = "Run[scalaz.concurrent.Task]"
+  implicit def asyncInstance(implicit S:Strategy): Async[Task] = new EffectTask with Async[Task] {
+    def ref[A]: Task[Async.Ref[Task,A]] = ScalazTask.ref[A](S)
+    override def toString = "Async[Task]"
   }
 
   /*
