@@ -19,8 +19,8 @@ Note: importing both of these in to the same lexical scope may cause issues with
 The 0.1.0 release is coming soon and you can start using the milestone release now.
 
 ```scala
-// available for Scala 2.11.8 + Scalaz 7.2.3
-libraryDependencies += "co.fs2" %% "fs2-scalaz" % "0.1.0-RC1"
+// available for Scala 2.11.8 + Scalaz 7.2.4
+libraryDependencies += "co.fs2" %% "fs2-scalaz" % "0.1.0-RC2"
 ```
 
 
