@@ -1,7 +1,7 @@
 package fs2
 package interop
 
-import _root_.scalaz.{ Monoid, Semigroup }
+import _root_.scalaz.{ Equal, Monoid, Semigroup }
 
 import _root_.scalaz.std.map._
 import _root_.scalaz.std.vector._
@@ -13,6 +13,12 @@ package object scalaz extends Instances with TaskAsyncInstances {
   object reverse extends ReverseInstances
 
   implicit class StreamScalazOps[F[_], A](val self: Stream[F, A]) extends AnyVal {
+
+    def distinctConsecutiveEq(implicit eq: Equal[A]): Stream[F, A] =
+      self.filterWithPrevious((x, y) => !eq.equal(x, y))
+
+    def distinctConsecutiveByEq[B](f: A => B)(implicit eq: Equal[B]): Stream[F, A] =
+      self.filterWithPrevious((x, y) => !eq.equal(f(x), f(y)))
 
     def foldMap[B](f: A => B)(implicit M: Monoid[B]): Stream[F, B] =
       self.fold(M.zero)((b, a) => M.append(b, f(a)))
