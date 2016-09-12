@@ -14,10 +14,10 @@ package object scalaz extends Instances with TaskAsyncInstances {
 
   implicit class StreamScalazOps[F[_], A](val self: Stream[F, A]) extends AnyVal {
 
-    def distinctConsecutiveEq(implicit eq: Equal[A]): Stream[F, A] =
+    def changesEq(implicit eq: Equal[A]): Stream[F, A] =
       self.filterWithPrevious((x, y) => !eq.equal(x, y))
 
-    def distinctConsecutiveByEq[B](f: A => B)(implicit eq: Equal[B]): Stream[F, A] =
+    def changesByEq[B](f: A => B)(implicit eq: Equal[B]): Stream[F, A] =
       self.filterWithPrevious((x, y) => !eq.equal(f(x), f(y)))
 
     def foldMap[B](f: A => B)(implicit M: Monoid[B]): Stream[F, B] =
