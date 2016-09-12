@@ -15,7 +15,7 @@ name := "fs2-scalaz"
 
 scalaVersion := "2.11.8"
 
-crossScalaVersions := Seq("2.11.8", "2.12.0-M5")
+crossScalaVersions := Seq("2.11.8", "2.12.0-RC1")
 
 scalacOptions ++= Seq(
   "-feature",
@@ -33,9 +33,9 @@ scalacOptions in (Compile, console) ~= {_.filterNot("-Ywarn-unused-import" == _)
 scalacOptions in (Test, console) <<= (scalacOptions in (Compile, console))
 
 resolvers += "Sonatype Public" at "https://oss.sonatype.org/content/groups/public/"
-val scalazVersion = "7.2.4"
+val scalazVersion = "7.2.6"
 libraryDependencies ++= Seq(
-  "co.fs2"     %% "fs2-core"          % "0.9.0-RC2",
+  "co.fs2"     %% "fs2-core"          % "0.9.0",
   "org.scalaz" %% "scalaz-core"       % scalazVersion,
   "org.scalaz" %% "scalaz-concurrent" % scalazVersion
 )
