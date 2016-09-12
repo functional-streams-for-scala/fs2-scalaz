@@ -16,11 +16,9 @@ Note: importing both of these in to the same lexical scope may cause issues with
 
 ### <a id="getit"></a> Where to get the latest version ###
 
-The 0.1.0 release is coming soon and you can start using the milestone release now.
-
 ```scala
-// available for Scala 2.11.8 + Scalaz 7.2.4
-libraryDependencies += "co.fs2" %% "fs2-scalaz" % "0.1.0-RC2"
+// available for Scala 2.11.8 / 2.12.0-RC1 + Scalaz 7.2.6
+libraryDependencies += "co.fs2" %% "fs2-scalaz" % "0.1.0"
 ```
 
 
