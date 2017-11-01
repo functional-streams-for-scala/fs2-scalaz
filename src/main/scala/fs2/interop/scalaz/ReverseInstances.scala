@@ -13,7 +13,7 @@ trait ReverseInstances extends ReverseInstances0 {
     def attempt[A](fa: F[A]) = F.handleError(F.map(fa)(a => Right(a): Either[Throwable, A]))(t => pure(Left(t)))
   }
 
-  implicit def naturalTransformationToUf1[F[_], G[_]](implicit nt: NaturalTransformation[F, G]): UF1[F, G] = new UF1[F, G] {
+  implicit def naturalTransformationToUf1[F[_], G[_]](nt: NaturalTransformation[F, G]): UF1[F, G] = new UF1[F, G] {
     def apply[A](fa: F[A]) = nt(fa)
   }
 }

@@ -12,7 +12,7 @@ trait Instances extends Instances0 {
     def handleError[A](fa: F[A])(f: Throwable => F[A]) = F.flatMap(F.attempt(fa))(e => e.fold(f, F.pure))
   }
 
-  implicit def uf1ToNatrualTransformation[F[_], G[_]](implicit uf1: UF1[F, G]): NaturalTransformation[F, G] = new NaturalTransformation[F, G] {
+  implicit def uf1ToNatrualTransformation[F[_], G[_]](uf1: UF1[F, G]): NaturalTransformation[F, G] = new NaturalTransformation[F, G] {
     def apply[A](fa: F[A]) = uf1(fa)
   }
 }
