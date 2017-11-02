@@ -13,9 +13,9 @@ lazy val contributors = Seq(
 organization := "co.fs2"
 name := "fs2-scalaz"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.11.11"
 
-crossScalaVersions := Seq("2.11.8", "2.12.1")
+crossScalaVersions := Seq("2.11.11", "2.12.4")
 
 scalacOptions ++= Seq(
   "-feature",
@@ -33,9 +33,9 @@ scalacOptions in (Compile, console) ~= {_.filterNot("-Ywarn-unused-import" == _)
 scalacOptions in (Test, console) <<= (scalacOptions in (Compile, console))
 
 resolvers += "Sonatype Public" at "https://oss.sonatype.org/content/groups/public/"
-val scalazVersion = "7.2.9"
+val scalazVersion = "7.2.16"
 libraryDependencies ++= Seq(
-  "co.fs2"     %% "fs2-core"          % "0.9.4",
+  "co.fs2"     %% "fs2-core"          % "0.9.7",
   "org.scalaz" %% "scalaz-core"       % scalazVersion,
   "org.scalaz" %% "scalaz-concurrent" % scalazVersion
 )
