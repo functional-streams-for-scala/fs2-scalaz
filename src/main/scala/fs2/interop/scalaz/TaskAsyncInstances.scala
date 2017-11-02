@@ -148,8 +148,8 @@ trait TaskAsyncInstances {
             actor ! Msg.Set(res)
           }
         }
-        t1.unsafePerformAsync(win)
-        t2.unsafePerformAsync(win)
+        Task.fork(t1).unsafePerformAsync(win)
+        Task.fork(t2).unsafePerformAsync(win)
       }
     }
 
