@@ -18,7 +18,7 @@ Note: importing both of these in to the same lexical scope may cause issues with
 
 ```scala
 // available for Scala 2.11.11 / 2.12.4 + Scalaz 7.2.16
-libraryDependencies += "co.fs2" %% "fs2-scalaz" % "0.4.0"
+libraryDependencies += "co.fs2" %% "fs2-scalaz" % "0.3.0"
 
 // available for Scala 2.11.8 / 2.12.0 + Scalaz 7.2.7
 libraryDependencies += "co.fs2" %% "fs2-scalaz" % "0.2.0"
